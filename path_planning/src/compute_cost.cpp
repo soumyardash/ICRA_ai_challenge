@@ -4,6 +4,15 @@
 
 using namespace std;
 
+typedef struct node{
+    double x;
+    double y;
+    double cost;
+}node;
+
+vector<vector<node> > vec;
+vector <node> g;
+
 double min(double a,double b){
     if(a<=b)
 	return a;
@@ -13,7 +22,7 @@ double min(double a,double b){
 
 //Function g(s) to be written that represents the path cost from s to the goal.
 
-void compute_cost(s,sa,sb){//Keep in mind that the total path cost is path length * cost associated with that path.
+void compute_cost(node s,node sa,node sb){//Keep in mind that the total path cost is path length * cost associated with that path.
     if(sa is a diagonal neighborof s){
 	s1 = sb; s2 = sa;
     }
@@ -55,6 +64,6 @@ return vs;
 }
 
 int main(){
-    double s,sa,sb;//Three points in the graph among which s is the starting point.
+    node s,sa,sb;//Three points in the graph among which s is the starting point taking inputs for x,y and cost for each node.
     compute_cost(s,sa,sb);
 }
