@@ -6,9 +6,10 @@
 using namespace std;
 
 typedef struct node{
-    double x;
-    double y;
-    double cost;
+	double x;
+	double y;
+	double cost;
+	double key;
 }node;
 
 vector<vector<node> > vec;
@@ -17,8 +18,8 @@ vector<vector<double> > g;
 node* start;
 
 double min(double a,double b){
-    if(a<=b) return a;
-    else return b;
+	if(a<=b) return a;
+	else return b;
 }
 
 node* determineAdjacent(node* s, node* s1, node* s2) {
@@ -36,23 +37,22 @@ node* determineAdjacent(node* s, node* s1, node* s2) {
 
 void compute_cost(node* s,node* sa, node* sb){//Keep in mind that the total path cost is path length * cost associated with that path.
 	node* s1, s2;
-    if(abs(sa->x-s->x) == 1 && abs(sa->y-s->y) == 1) s1 = sb; s2 = sa;
-    else s1 = sa; s2 = sb;
-
+	if(abs(sa->x-s->x) == 1 && abs(sa->y-s->y) == 1) s1 = sb; s2 = sa;
+	else s1 = sa; s2 = sb;
 	c = s->cost;
 	node* adj = determineAdjacent(s, s1, s2);
 	b = min(s.cost, adj.cost);
 
 	double vs;
-    if (min(c, b) == 1000000.0){
+	if (min(c, b) == 1000000.0){
 		vs = 1000000.0;
-    }
-    else if (g[s1->x][s1->y] <= g[s2->x][s2->y]){
-        vs = min(c,b) + g[s1->x][s1->y]; //Fig 5(ii) of paper
-    }
-    else{
+	}
+	else if (g[s1->x][s1->y] <= g[s2->x][s2->y]){
+		vs = min(c,b) + g[s1->x][s1->y]; //Fig 5(ii) of paper
+	}
+	else{
 		double f = g[s1->x][s1->y] - g[s2->x][s2->y];
-		if (f <= b){
+		if(f <= b) {
 			if (c <= f){
 				vs = c*sqrt(2) + g[s2->x][s2->y]; //Directly s to s2
 			}
@@ -70,7 +70,7 @@ void compute_cost(node* s,node* sa, node* sb){//Keep in mind that the total path
 				vs = c*sqrt(1+(1-x)*(1-x)) + b*x + g[s2->x][s2->y]; //Fig 5(iii) of paper
 			}
 		}
-    }
+	}
 	return vs;
 }
 
@@ -79,10 +79,39 @@ pair<double, double> key(node* s) {
 	return make_pair(min(g[s->x][s->y], rhs[s->x][s->y]) + h, min(g[s->x][s->y], rhs[s->x][s->y]));
 }
 
-queue <node> open;
+vector<node*> open;
 
-void updateState() {
-	if(g[s->x][s->y] - rhs[s->x][s->y] < 0.00001)
+void insertInOpen(node* s) {
+	int i, j;
+	int inserted;
+	for(i = 0, j = open.size() ; i < j ; ) {
+		if(s->key < open[(i+j)/2]) j=(i+j)/2 - 1;
+		else if(s->key > open[(i+j)/2]) i = (i+j)/2 + 1;
+		else {
+			open.insert(open.begin() + (i+j)/2, s);
+			inserted = 1;
+			break;
+		}
+	}
+	if(!inserted) open.insert(open.begin() + (i+j)/2, s);
+}
+
+int searchInOpen(node* s) {
+    for(int i = 0, j = open.size() ; i < j ;) {
+	if(s.key == open[(i+j)/2]) return (i+j)/2;
+    }
+    return -1;
+}
+
+void updateState(node* s) {
+	if(!(g[s->x][s->y] - rhs[s->x][s->y] < 0.00001)) {
+		s.key = key(s);
+		insertInOpen(s);
+	}
+	else {
+		int i = searchInOpen(s);
+		if(i != -1) open.erase(open.begin() + i);
+	}
 }
 
 int main(){
