@@ -9,7 +9,7 @@ typedef struct node{
     double x;
     double y;
     double cost;
-    double key;
+    pair<double, double> key;
     double rhs;
     double g;
     node* bptr;
