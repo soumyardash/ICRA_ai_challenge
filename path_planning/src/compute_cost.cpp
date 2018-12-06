@@ -10,12 +10,12 @@ typedef struct node{
     double y;
     double cost;
     double key;
+    double rhs;
+    double g;
     node* bptr;
 }node;
 
 vector<vector<node*> > vec;
-vector<vector<double> > rhs;
-vector<vector<double> > g;
 node* start;
 
 double min(double a, double b){
@@ -67,7 +67,7 @@ node* determineNeighbour(node* s, node* s1, int c) {
     else ROS_ERROR("Cannot determine neighbour node");
 }
 
-double compute_cost(node* s,node* sa, node* sb){//Keep in mind that the total path cost is path length * cost associated with that path.
+double computeCost(node* s,node* sa, node* sb){//Keep in mind that the total path cost is path length * cost associated with that path.
     node* s1, s2;
     if(abs(sa->x-s->x) == 1 && abs(sa->y-s->y) == 1) s1 = sb; s2 = sa;
     else s1 = sa; s2 = sb;
@@ -79,27 +79,27 @@ double compute_cost(node* s,node* sa, node* sb){//Keep in mind that the total pa
     if (min(c, b) == 1000000.0){
 	vs = 1000000.0;
     }
-    else if (g[s1->x][s1->y] <= g[s2->x][s2->y]){
-	vs = min(c,b) + g[s1->x][s1->y]; //Fig 5(ii) of paper
+    else if (s1->g <= s2->g){
+	vs = min(c,b) + s1->g; //Fig 5(ii) of paper
     }
     else{
-	double f = g[s1->x][s1->y] - g[s2->x][s2->y];
+	double f = s1->g - s2->g;
 	if(f <= b) {
 	    if (c <= f){
-		vs = c*sqrt(2) + g[s2->x][s2->y]; //Directly s to s2
+		vs = c*sqrt(2) + s2->g; //Directly s to s2
 	    }
 	    else{
 		double y = min(f/sqrt(c*c-f*f), 1);
-		vs = c*sqrt(1+y*y) + f*(1 − y) + g[s2->x][s2->y]; //Fig 5(iv) of paper
+		vs = c*sqrt(1+y*y) + f*(1 − y) + s2->g; //Fig 5(iv) of paper
 	    }
 	}
 	else{
 	    if (c <= b){
-		vs = c*sqrt(2) + g[s2->x][s2->y]; //Directly s to s2
+		vs = c*sqrt(2) + s2->g; //Directly s to s2
 	    }
 	    else{
 		double x = 1 − min(b/sqrt(c*c-b*b), 1);
-		vs = c*sqrt(1+(1-x)*(1-x)) + b*x + g[s2->x][s2->y]; //Fig 5(iii) of paper
+		vs = c*sqrt(1+(1-x)*(1-x)) + b*x + s2->g; //Fig 5(iii) of paper
 	    }
 	}
     }
@@ -108,7 +108,7 @@ double compute_cost(node* s,node* sa, node* sb){//Keep in mind that the total pa
 
 pair<double, double> key(node* s) {
     double h = sqrt((s->x - start->x)*(s->x - start->x) + (s->y - start->y)*(s->y - start->y))/2
-	return make_pair(min(g[s->x][s->y], rhs[s->x][s->y]) + h, min(g[s->x][s->y], rhs[s->x][s->y]));
+    return make_pair(min(s->g, s->rhs) + h, min(s->g, s->rhs));
 }
 
 vector<node*> open;
@@ -117,27 +117,27 @@ void insertInOpen(node* s) {
     int i, j;
     int inserted;
     for(i = 0, j = open.size() ; i < j ; ) {
-	if(s->key < open[(i+j)/2]) j=(i+j)/2 - 1;
-	else if(s->key > open[(i+j)/2]) i = (i+j)/2 + 1;
-	else {
+	if(s->key.first < open[(i+j)/2]->key.first || s->key.first == open[(i+j)/2]->key.first && s->key.second < open[(i+j)/2]->key.second) j=(i+j)/2 - 1;
+	else if(s->key.first == open[(i+j)/2]->key.first && s->key.second == open[(i+j)/2]->key.second){
 	    open.insert(open.begin() + (i+j)/2, s);
 	    inserted = 1;
 	    break;
 	}
+	else i = (i+j)/2 + 1;
     }
     if(!inserted) open.insert(open.begin() + (i+j)/2, s);
 }
 
 int searchInOpen(node* s) {
     for(int i = 0, j = open.size() ; i < j ;) {
-	if(s.key == open[(i+j)/2]) return (i+j)/2;
+	if(s->key.first == open[(i+j)/2]->key.first && s->key.second == open[(i+j)/2]->key.second) return (i+j)/2;
     }
     return -1;
 }
 
 void updateState(node* s) {
-    if(!(g[s->x][s->y] - rhs[s->x][s->y] < 0.00001)) {
-	s.key = key(s);
+    if(s->g != s->rhs) {
+	s->key = key(s);
 	insertInOpen(s);
     }
     else {
@@ -147,10 +147,10 @@ void updateState(node* s) {
 }
 
 void computeShortestPath() {
-    while(open[0]->key < start->key || abs(g[start->x][start->y] - rhs[start->x][start->y]) > 0.0001) { //4
+    while(open[0]->key.first < start->key.first || (open[0].key->first == start->key.first && open[0].key->second < start->key.second) || start->g != start->rhs) { //4
 	node* s = open[0]; //5
-	if(g[s->x][s->y] > rhs[s->x][s->y]) { //6
-	    g[s->x][s->y] = rhs[s->x][s->y]; //7
+	if(s->g > s->rhs) { //6
+	    s->g = s->rhs //7
 	    open.erase(open.begin()); //8
 	    node* s1;
 	    node* s2;
@@ -160,18 +160,18 @@ void computeShortestPath() {
 			if(s->x+i < vec.size() && s->x+i >= 0 && s->y+j < vec[s->x+i].size() && s->y+j > 0) {
 			    s1 = vec[s->x+i][s->y+j];
 			    //TODO 10, 11
-			    double rhsold = rhs[s1->x][s1->y]; //12
+			    double rhsold = s1->rhs; //12
 			    double cost = computeCost(s1, s, determineNeighbour(s1, s, 0));
-			    if(rhs[s1->x][s1->y] > cost){ //13
-				rhs[s1->x][s1->y] = cost; //14
+			    if(s1->rhs > cost){ //13
+				s1->rhs = cost; //14
 				s1->bptr = s; //15
 			    }
 			    s2 = determineNeighbour(s1, s, 1);
-			    if(rhs[s1->x][s1->y] > computeCost(s1, s, s2)) { //16
-				rhs[s1->x][s1->y] = computeCost(s1, s2, s); //17
+			    if(s1->rhs > computeCost(s1, s, s2)) { //16
+				s1->rhs = computeCost(s1, s2, s); //17
 				s1->bptr = s2; //18
 			    }
-			    if(!(abs(rhsold - rhs[s1->x][s1->y]) < 0.00001)) { //19
+			    if(rhsold != s1->rhs) { //19
 				updateState(s1); //20
 			    }
 			}
@@ -195,19 +195,19 @@ void computeShortestPath() {
 		    }
 		}
 	    }
-	    rhs[s->x][s->y] = min; //22
+	    s->rhs = min; //22
 	    s->bptr = sk; //23
-	    if(g[s->x][s->y] < rhs[s->x][s->y]) { //24
-		g[s->x][s->y] = 1000000.0; //25
+	    if(s->g < s->rhs) { //24
+		s->g = 1000000.0; //25
 		for(int i = -1 ; i < 2 ; i++) {
 		    for(int j = -1 ; j < 2 ; j++) { //26
 			if(!(i == 0 && j == 0)) {
 			    if(s->x+i < vec.size() && s->x+i >= 0 && s->y+j < vec[s->x+i].size() && s->y+j > 0) {
 				node* s1 = vec[s->x+i][s->y+j];
 				if(s1->bptr == s || s1->bptr == determineNeighbour(s1, s, 0)){ //27
-				    if(rhs[s1->x][s1->y] != computeCost(s1, s1->bptr, determineNeighbour(s1, s1->bptr, 0))) { //28
-					if(g[s1->x][s1->y] < rhs[s1->x][s1->y] || searchInOpen(s1) == -1) { //29
-					    rhs[s1->x][s1->y] = 1000000.0; //30
+				    if(s1->rhs != computeCost(s1, s1->bptr, determineNeighbour(s1, s1->bptr, 0))) { //28
+					if(s1->g < s1->rhs || searchInOpen(s1) == -1) { //29
+					    s1->rhs = 1000000.0; //30
 					    updateState(s1); //31
 					}
 					else { //32
@@ -226,7 +226,7 @@ void computeShortestPath() {
 						    }
 						}
 					    }
-					    rhs[s1->x][s1->y] = mink; //33
+					    s1->rhs = mink; //33
 					    s1->bptr = skk; //34
 					    updateState(s1); //35
 					}
