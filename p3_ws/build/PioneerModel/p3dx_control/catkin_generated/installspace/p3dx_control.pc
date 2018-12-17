@@ -1,8 +1,0 @@
-prefix=/home/soumya/.gazebo/models/p3_ws/install
-
-Name: p3dx_control
-Description: Description of p3dx_control
-Version: 0.0.1
-Cflags: 
-Libs: -L/home/soumya/.gazebo/models/p3_ws/install/lib 
-Requires: 

@@ -1,8 +1,0 @@
-prefix=/home/soumya/.gazebo/models/p3_ws/devel
-
-Name: lidar_data
-Description: Description of lidar_data
-Version: 0.0.0
-Cflags: 
-Libs: -L/home/soumya/.gazebo/models/p3_ws/devel/lib 
-Requires: 

@@ -1,8 +1,0 @@
-prefix=/home/soumya/.gazebo/models/p3_ws/devel
-
-Name: pid
-Description: Description of pid
-Version: 0.0.0
-Cflags: -I/home/soumya/.gazebo/models/p3_ws/src/pid/include
-Libs: -L/home/soumya/.gazebo/models/p3_ws/devel/lib 
-Requires: 
