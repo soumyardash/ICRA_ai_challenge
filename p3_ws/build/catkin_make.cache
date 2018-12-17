@@ -1,0 +1,2 @@
+
+-DCATKIN_DEVEL_PREFIX=/home/soumya/ERA/ICRA_ai_challenge/p3_ws/devel -DCMAKE_INSTALL_PREFIX=/home/soumya/ERA/ICRA_ai_challenge/p3_ws/install -G Unix Makefiles
