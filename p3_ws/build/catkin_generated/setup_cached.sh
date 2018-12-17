@@ -8,6 +8,9 @@
 
 # modified environment variables
 export CMAKE_PREFIX_PATH="/home/soumya/ERA/ICRA_ai_challenge/p3_ws/devel:$CMAKE_PREFIX_PATH"
+export LD_LIBRARY_PATH="/home/soumya/ERA/ICRA_ai_challenge/p3_ws/devel/lib:$LD_LIBRARY_PATH"
+export PKG_CONFIG_PATH="/home/soumya/ERA/ICRA_ai_challenge/p3_ws/devel/lib/pkgconfig:$PKG_CONFIG_PATH"
 export PWD="/home/soumya/ERA/ICRA_ai_challenge/p3_ws/build"
+export PYTHONPATH="/home/soumya/ERA/ICRA_ai_challenge/p3_ws/devel/lib/python2.7/dist-packages:$PYTHONPATH"
 export ROSLISP_PACKAGE_DIRECTORIES="/home/soumya/ERA/ICRA_ai_challenge/p3_ws/devel/share/common-lisp"
 export ROS_PACKAGE_PATH="/home/soumya/ERA/ICRA_ai_challenge/p3_ws/src:$ROS_PACKAGE_PATH"

@@ -117,6 +117,12 @@ endif()
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
   include("/home/soumya/ERA/ICRA_ai_challenge/p3_ws/build/gtest/cmake_install.cmake")
+  include("/home/soumya/ERA/ICRA_ai_challenge/p3_ws/build/PioneerModel/p3dx_control/cmake_install.cmake")
+  include("/home/soumya/ERA/ICRA_ai_challenge/p3_ws/build/pid/cmake_install.cmake")
+  include("/home/soumya/ERA/ICRA_ai_challenge/p3_ws/build/rosaria/cmake_install.cmake")
+  include("/home/soumya/ERA/ICRA_ai_challenge/p3_ws/build/PioneerModel/rosaria_client/cmake_install.cmake")
+  include("/home/soumya/ERA/ICRA_ai_challenge/p3_ws/build/PioneerModel/p3dx_description/cmake_install.cmake")
+  include("/home/soumya/ERA/ICRA_ai_challenge/p3_ws/build/PioneerModel/p3dx_gazebo/cmake_install.cmake")
 
 endif()
 
