@@ -1,0 +1,2 @@
+PioneerModel/p3dx_control:PioneerModel/p3dx_description:PioneerModel/p3dx_gazebo:PioneerModel/rosaria_client:pid:rosaria
+-DCATKIN_DEVEL_PREFIX=/home/soumya/.gazebo/models/p3_ws/devel -DCMAKE_INSTALL_PREFIX=/home/soumya/.gazebo/models/p3_ws/install -G Unix Makefiles

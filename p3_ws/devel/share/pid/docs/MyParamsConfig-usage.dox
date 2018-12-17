@@ -1,0 +1,14 @@
+\subsubsection usage Usage
+\verbatim
+<node name="pid" pkg="pid" type="pid">
+  <param name="double_param1" type="double" value="2.58" />
+  <param name="double_param2" type="double" value="0.047" />
+  <param name="double_param3" type="double" value="0.0" />
+  <param name="double_param4" type="double" value="2.0" />
+  <param name="double_param5" type="double" value="0.1" />
+  <param name="double_param6" type="double" value="0.0" />
+  <param name="double_param7" type="double" value="5.0" />
+  <param name="double_param8" type="double" value="5.0" />
+</node>
+\endverbatim
+
